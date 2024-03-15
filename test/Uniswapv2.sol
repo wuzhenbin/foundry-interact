@@ -9,9 +9,9 @@ import "./interfaces/IWETH9.sol";
 import "./interfaces/IUniswap.sol";
 import "./interfaces/IERC20.sol";
 
-import {HelperConfig} from "../script/MainnetConfig.s.sol";
+import {HelperConfig} from "../script/HelperConfig.s.sol";
 
-contract ContractTest is Test {
+contract Uniswapv2Test is Test {
     IERC20 WBTC;
     IERC20 DAI;
     WETH9 WETH;
@@ -22,24 +22,28 @@ contract ContractTest is Test {
         vm.createSelectFork("mainnet", 15327706);
 
         HelperConfig helperConfig = new HelperConfig();
-        (address wbtc, address dai, address weth, address uniswap_v2_router) = helperConfig.activeNetworkConfig();
+
+        address weth = helperConfig.getVar("weth");
+        address dai = helperConfig.getVar("dai");
+        address uniswap_v2_router = helperConfig.getVar("uniswap_v2_router");
+        address wbtc = helperConfig.getVar("wbtc");
 
         WBTC = IERC20(wbtc);
         DAI = IERC20(dai);
         WETH = WETH9(weth);
         UNISWAP_V2_ROUTER = IUniswapV2Router(uniswap_v2_router);
 
-        vm.label(address(WBTC), "WBTC");
-        vm.label(address(DAI), "DAI");
-        vm.label(address(WETH), "WETH");
-        vm.label(address(UNISWAP_V2_ROUTER), "ROUTER");
+        vm.label(wbtc, "WBTC");
+        vm.label(dai, "DAI");
+        vm.label(weth, "WETH");
+        vm.label(uniswap_v2_router, "ROUTER");
 
         vm.startPrank(0x218B95BE3ed99141b0144Dba6cE88807c4AD7C09);
         WBTC.transfer(address(this), 10 ** WBTC.decimals()); // transfer 1 BTC to self-contract
         vm.stopPrank();
     }
 
-    function testUniswapv2_swap() public {
+    function testUniswapv2Swap() public {
         uint256 daiToDecimals = 10 ** DAI.decimals();
         uint256 wbtcToDecimals = 10 ** WBTC.decimals();
 
